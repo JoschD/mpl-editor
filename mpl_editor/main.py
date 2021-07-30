@@ -16,8 +16,8 @@ def _quick_figure():
     import matplotlib.pyplot as plt
     fig = plt.figure()
     plt.text(.5, .5, "Hallo")
-    plt.errorbar(range(3), range(3), yerr=range(3), xerr=range(3), capsize=3)
-    plt.plot([0, 3], [0, 5], color="red")
+    plt.errorbar(range(3), range(3), yerr=range(3), xerr=range(3), capsize=3, label="errorbar")
+    plt.plot([0, 3], [0, 5], color="red", label="someline")
     return fig
 
 

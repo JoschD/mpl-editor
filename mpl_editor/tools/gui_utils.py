@@ -1,9 +1,11 @@
 import os
+from pathlib import Path
+
 import matplotlib
 from PyQt5 import QtGui
 
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-IMAGE_DIR = os.path.join(THIS_DIR, 'images')
+ROOT_DIR = Path(__file__).parent.parent
+IMAGE_DIR = ROOT_DIR / 'images'
 
 
 # Images #####################################################################
@@ -14,16 +16,17 @@ def get_image_dir():
 
 
 def get_image_path(filename):
-    return os.path.join(IMAGE_DIR, filename)
+    return IMAGE_DIR / filename
 
 
 def get_icon(name):
-    if os.path.splitext(name)[1] == "":
-        name += ".png"
+    name = Path(name)
+    if name.suffix == "":
+        name = name.with_suffix(".png")
     img_file = get_image_path(name)
-    if not os.path.isfile(img_file):
-        img_file = os.path.join(matplotlib.rcParams['datapath'], 'images', name)
-        if not os.path.isfile(img_file):
-            raise IOError("Image '{}' not found.".format(img_file))
-    return QtGui.QIcon(img_file)
+    if not img_file.is_file():
+        img_file = Path(matplotlib.get_data_path()) / 'images' / name
+        if not img_file.is_file():
+            raise IOError(f"Image '{img_file}' not found.")
+    return QtGui.QIcon(str(img_file))
 

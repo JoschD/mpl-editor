@@ -19,3 +19,10 @@ class DotDict(dict):
             return super(DotDict, self).__getitem__(key)
         except KeyError as e:
             raise AttributeError from e
+
+    def __getstate__(self):
+        return self
+
+    def __setstate__(self, state):
+        self.update(state)
+        self.__dict__ = self

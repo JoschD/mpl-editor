@@ -27,6 +27,7 @@ import numpy as np
 
 from mpl_editor.tools.gui_utils import get_icon
 import mpl_editor.io.utils as io
+from mpl_editor.options_view import artists as oartists
 from mpl_editor.main_window.widgets import (
     FigureCanvasExt, NavigationToolbar, LogDialog, LogStatusBar, DragHandler
 )
@@ -49,7 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, fig=None, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent)
-        self.setWindowTitle('TFS-Plotter')
+        self.setWindowTitle('MPL Editor')
         self.setWindowIcon(get_icon("photo"))
 
         self._create_logger()
@@ -221,8 +222,8 @@ class MainWindow(QtWidgets.QMainWindow):
         # matplotlib.backend_bases.PickEvent
         #
         if event.mouseevent.button == 1 and event.mouseevent.dblclick:
-            LOG.debug("You've dblclicked on : {:s}".format(event.artist))
-            options_artists.change_properties(event.artist, self)
+            LOG.debug(f"You've doubleclicked on : {event.artist!s}")
+            oartists.change_properties(event.artist, self)
             self.update_figure()
             self._dragged = None
 

@@ -9,14 +9,14 @@ TODO:
  - Add visibility to options_figure
 
 """
-import matplotlib as mpl
-import matplotlib.backends.qt_editor.formlayout as formlayout
+from contextlib import suppress
 
-import six
+import matplotlib as mpl
+import matplotlib.backends.qt_editor._formlayout as formlayout
+from matplotlib.container import ErrorbarContainer
 
 from mpl_editor.tools.gui_utils import get_icon
-import mpl_editor.options_utils as outils
-from mpl_editor.general_helper import suppress_exception
+import mpl_editor.options_view.utils as outils
 
 
 formlayout.BLACKLIST = {"title", "label", "position", "name", "text"}
@@ -64,7 +64,7 @@ def _show_form(props, title, parent):
         if isinstance(ppty, Property):
             # proper property
             form.append(ppty.get_form_line())
-        elif isinstance(ppty, six.string_types):
+        elif isinstance(ppty, str):
             # tuple
             form.append((None, "<b>{}</b>".format(ppty)))
         else:
@@ -231,11 +231,19 @@ def _get_line_properties(line):
     return props, title
 
 
-def _get_ebar_properties(ebar):
+def _get_ebar_properties(ebar: ErrorbarContainer):
+    """
+    Returns the properties of the ErrorbarContainer ebar.
+    lines: tuple of (data_line: the Line2D instace of x,y plot markers and/or line,
+                     caplines: tuple of Line2D instances of the error bar caps,
+                     barlinecols: List of LineCollection with the horizontal and vertical error ranges)
+
+    has_xerr/has_yerr: True if errorbar has x/y errors.
+    """
     title = "Edit Line '{}'".format(ebar.get_label())
 
     bar = None  # bar reference
-    with suppress_exception(IndexError):
+    with suppress(IndexError):
         bar = ebar[2][0]
 
     label = ebar.get_label()
@@ -258,11 +266,9 @@ def _get_ebar_properties(ebar):
     props += _get_line_properties(ebar[0])[0][3:]
 
     if bar is not None:
-        ls = bar.get_linestyles()[0][0]
-        if ls is None:
-            ls = "None"  # it seems as if None here is "Solid" for some reason.
-            # Workaround: set width to 0
-
+        # Hint "none" and "solid" are identical here
+        # to deactivate line one would have to set the width to 0
+        ls = outils.convert_linestyle_to_approximate_str(bar.get_linestyles()[0])
         ls_def, ls_choices = outils.prepare_formdata(outils.get_linestyles(), ls)
 
         # ms_def, ms_choices = outils.prepare_formdata(

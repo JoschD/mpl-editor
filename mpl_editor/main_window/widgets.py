@@ -1,14 +1,16 @@
 import logging
 import os
 import time
+from pathlib import Path
+
 from PyQt5 import QtWidgets, QtCore
 
 import matplotlib
-import six
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT
 
 from mpl_editor.tools.gui_utils import get_icon
+from mpl_editor.options_view import figure as ofigure, utils as outils
 
 # Log Dialog Window ##########################################################
 
@@ -122,55 +124,13 @@ class NavigationToolbar(NavigationToolbar2QT):
 
         super(NavigationToolbar, self).__init__(canvas, parent)
 
-    def _init_toolbar(self):
-        """ Called from the super function """
-        self.basedir = os.path.join(matplotlib.rcParams['datapath'], 'images')
-
-        for text, tooltip_text, image_file, callback in self.toolitems:
-            if text is None:
-                self.addSeparator()
-            else:
-                try:
-                    icon = get_icon(image_file)
-                except IOError:
-                    icon = self._icon(image_file + '.png')
-
-                a = self.addAction(icon,
-                                   text, getattr(self, callback))
-                self._actions[callback] = a
-                if callback in ['zoom', 'pan']:
-                    a.setCheckable(True)
-                if tooltip_text is not None:
-                    a.setToolTip(tooltip_text)
-                if text == 'Subplots':
-                    a = self.addAction(self._icon("qt4_editor_options.png"),
-                                       'Customize', self.edit_parameters)
-                    a.setToolTip('Edit axis, curve and image parameters')
-
-        self.buttons = {}
-
-        # Add the x,y location widget at the right side of the toolbar
-        # The stretch factor is 1 which means any resizing of the toolbar
-        # will resize this label instead of the buttons.
-        if self.coordinates:
-            self.locLabel = QtWidgets.QLabel("", self)
-            self.locLabel.setAlignment(
-                QtCore.Qt.AlignRight | QtCore.Qt.AlignTop)
-            self.locLabel.setSizePolicy(
-                QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding,
-                                      QtWidgets.QSizePolicy.Ignored))
-            labelAction = self.addWidget(self.locLabel)
-            labelAction.setVisible(True)
-
-        # reference holder for subplots_adjust window
-        self.adj_window = None
-
-        # Aesthetic adjustments - we need to set these explicitly in PyQt5
-        # otherwise the layout looks different - but we don't want to set it if
-        # not using HiDPI icons otherwise they look worse than before.
-
-        self.setIconSize(QtCore.QSize(NavigationToolbar.ICON_SIZE, NavigationToolbar.ICON_SIZE))
-        self.layout().setSpacing(12)
+    def _icon(self, name):
+        """ Overwrite _icon() as called in super.__init__ to check for
+        local icons first. '.png' will already be added to name. """
+        try:
+            return get_icon(name)
+        except IOError:
+            return super(NavigationToolbar, self)._icon(name)
 
     def edit_parameters(self):
         allaxes = self.canvas.figure.get_axes()
@@ -192,11 +152,11 @@ class NavigationToolbar(NavigationToolbar2QT):
             item, ok = QtWidgets.QInputDialog.getItem(
                 self.parent, 'Customize', 'Select axes:', titles, 0, False)
             if ok:
-                axes = allaxes[titles.index(six.text_type(item))]
+                axes = allaxes[titles.index(str(item))]
             else:
                 return
 
-        options_figure.figure_edit(axes, self)
+        ofigure.figure_edit(axes, self)
 
 
 # Figure Canvas ################################################################
@@ -225,7 +185,7 @@ class FigureCanvasExt(FigureCanvas):
 
     def update_legend(self):
         axes = self.figure.gca()
-        options_utils.regenerate_legend(axes, force_new=True)
+        outils.regenerate_legend(axes, force_new=True)
         self._save_legend_loc()
         self.draw()
 

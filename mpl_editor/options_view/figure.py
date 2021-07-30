@@ -16,9 +16,9 @@ from __future__ import (division, print_function,
 import re
 
 from matplotlib import cm, colors as mcolors, image as mimage
-import matplotlib.backends.qt_editor.formlayout as formlayout
+import matplotlib.backends.qt_editor._formlayout as formlayout
 
-import mpl_editor.options_utils as outils
+import mpl_editor.options_view.utils as outils
 from mpl_editor.tools.gui_utils import get_icon
 
 LINESTYLES = outils.get_linestyles()

@@ -6,9 +6,9 @@ import logging
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QFileDialog
 
-from io_widgets import ColumnSelectorDialog
-from tfs_files import tfs_pandas as tfs
-from plotshop import plot_tfs
+from mpl_editor.io.widgets import ColumnSelectorDialog
+import tfs
+from tfs.handler import TfsFormatError
 
 LOG = logging.getLogger(__name__)
 
@@ -37,20 +37,21 @@ def load_tfs():
             LOG.debug("Loading only one file")
             try:
                 df = tfs.read_tfs(paths[0])
-            except tfs.TfsFormatError:
+            except TfsFormatError:
                 LOG.error("File '{}' is not of TFS format!".format(paths[0]))
             else:
                 column_selector = ColumnSelectorDialog(df.columns.tolist())
                 selected = column_selector.get_selected_columns()
                 if selected:
-                    fig = plot_tfs.plot_single_file(
-                        files=paths,
-                        x_cols=[s["x"] for s in selected],
-                        y_cols=[s["y"] for s in selected],
-                        e_cols=[s["e"] for s in selected],
-                        labels=[s["l"] for s in selected],
-                        no_show=True,
-                    )
+                    NotImplemented("Plotting not yet implemented")
+                    # fig = plot_tfs.plot_single_file(
+                    #     files=paths,
+                    #     x_cols=[s["x"] for s in selected],
+                    #     y_cols=[s["y"] for s in selected],
+                    #     e_cols=[s["e"] for s in selected],
+                    #     labels=[s["l"] for s in selected],
+                    #     no_show=True,
+                    # )
         return fig
     LOG.debug("No files chosen.")
     return None
