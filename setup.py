@@ -3,7 +3,7 @@ import pathlib
 import setuptools
 
 # The directory containing this file
-MODULE_NAME = "pylhc"
+MODULE_NAME = "mpl_editor"
 TOPLEVEL_DIR = pathlib.Path(__file__).parent.absolute()
 ABOUT_FILE = TOPLEVEL_DIR / MODULE_NAME / "__init__.py"
 README = TOPLEVEL_DIR / "README.md"
@@ -29,31 +29,14 @@ with README.open("r") as docs:
 
 # Dependencies for the module itself
 DEPENDENCIES = [
-    "numpy>=1.19",
-    "scipy>=1.4.0",
-    "pandas>=1.0,<1.2",  # limit because of https://github.com/pandas-dev/pandas/issues/39872
     "matplotlib>=3.2.0",
-    "pjlsa>=0.0.14",
-    "pytimber>=2.8.0",
     "tfs-pandas>=2.0",
-    "generic-parser>=1.0.8",
-    "parse>=1.15.0",
-    "omc3@https://github.com/pylhc/omc3/tarball/master",
+    "PyQt5",
+    "PyQt5-stubs"
 ]
 
 EXTRA_DEPENDENCIES = {
-    "tech": [
-        "jpype1<0.8.0,>=0.7.3",  # limit from pylsa
-        # "cmmnbuild-dep-manager/@https://gitlab.cern.ch/scripting-tools/cmmnbuild-dep-manager/repository/archive.tar.gz?ref=master",
-        "pyjapc@https://gitlab.cern.ch/scripting-tools/pyjapc/repository/archive.tar.gz?ref=master",
-    ],
-    "test": [
-        "pytest>=5.2",
-        "pytest-cov>=2.7",
-        "pytest-regressions>=2.0.0",
-        "pytest-mpl>=0.11",
-    ],
-    "doc": ["sphinx", "sphinx_rtd_theme"],
+    "test": [],
 }
 EXTRA_DEPENDENCIES.update(
     {"all": [elem for list_ in EXTRA_DEPENDENCIES.values() for elem in list_]}

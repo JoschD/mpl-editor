@@ -1,5 +1,6 @@
 import os
-import six
+from pathlib import Path
+
 import matplotlib
 import logging
 
@@ -105,12 +106,11 @@ def save_figure(figure):
      From backend_qt5.NavigationToolbar2QT
      """
     filetypes = figure.canvas.get_supported_filetypes_grouped()
-    sorted_filetypes = sorted(six.iteritems(filetypes))
+    sorted_filetypes = sorted(filetypes.items())
     default_filetype = figure.canvas.get_default_filetype()
 
-    startpath = os.path.expanduser(
-        matplotlib.rcParams['savefig.directory'])
-    start = os.path.join(startpath, figure.canvas.get_default_filename())
+    saved_directory = Path(matplotlib.rcParams['savefig.directory']).expanduser()
+    output_suggestion = saved_directory / figure.canvas.get_default_filename()
     filters = []
     selected_filter = None
 
@@ -124,21 +124,22 @@ def save_figure(figure):
 
     fname, filter = QtWidgets.QFileDialog.getSaveFileName(
         caption="Choose a filename to save to",
-        directory=start,
+        directory=str(output_suggestion),
         filter=filters,
         initialFilter=selected_filter,
     )
 
     if fname:
-        # Save dir for next time, unless empty str (i.e., use cwd).
-        if startpath != "":
-            matplotlib.rcParams['savefig.directory'] = (
-                os.path.dirname(six.text_type(fname)))
+        fname = Path(fname)
+
+        # Save dir for next time, unless empty (i.e., use cwd).
+        if saved_directory != Path():
+            matplotlib.rcParams['savefig.directory'] = fname.parent
         try:
-            figure.savefig(six.text_type(fname))
+            figure.savefig(fname)
         except Exception as e:
             QtWidgets.QMessageBox.critical(
-                None, "Error saving file", six.text_type(e),
+                None, "Error saving file", str(e),
                 QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.NoButton)
 
 
