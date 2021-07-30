@@ -31,7 +31,6 @@ def convert_linestyle_to_approximate_str(ls: Union[str, Tuple[int, Tuple[int]]])
      also from tuple-form into string.
     see: https://matplotlib.org/stable/gallery/lines_bars_and_markers/linestyles.html
     """
-    print(ls)
     if ls is None:
         return "none"
 

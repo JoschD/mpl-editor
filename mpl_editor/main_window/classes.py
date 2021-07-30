@@ -28,14 +28,12 @@ import numpy as np
 from mpl_editor.tools.gui_utils import get_icon
 import mpl_editor.io.utils as io
 from mpl_editor.options_view import artists as oartists
-from mpl_editor.main_window.widgets import (
-    FigureCanvasExt, NavigationToolbar, LogDialog, LogStatusBar, DragHandler
-)
+from mpl_editor.main_window.widgets.canvas import FigureCanvasExt
+from mpl_editor.main_window.widgets.navigation_toolbar import NavigationToolbar
+from mpl_editor.main_window.widgets.logging import LogDialog, LogStatusBar
+from mpl_editor.main_window.widgets.dragging import DragHandler
 
 LOG = logging.getLogger(__name__)
-
-_VERSION = "0.0_prealpha"
-_AUTHOR = "Joschua"
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -81,14 +79,15 @@ class MainWindow(QtWidgets.QMainWindow):
         )
         root_logger.addHandler(self._log_dialog)
 
-        self._status_bar = LogStatusBar(
+        status_bar = LogStatusBar(
             fmt="%(asctime)s %(message)s",
             datefmt='%H:%M:%S',
             parent=self
         )
-        self._status_bar.setFixedHeight(self.status_bar_height)
-        root_logger.addHandler(self._status_bar)
-        self.setStatusBar(self._status_bar)
+        status_bar.setFixedHeight(self.status_bar_height)
+        # status_bar.setLevel(logging.DEBUG)  # for testing
+        root_logger.addHandler(status_bar)
+        self.setStatusBar(status_bar)
 
     def _create_menu(self):
         """ Add a menu """
@@ -188,7 +187,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def _connect_events(self):
         # Bind the clicking events to our handlers
         #
-        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)  # needed for key events to regisiter
+        self.canvas.setFocusPolicy(QtCore.Qt.ClickFocus)  # needed for key events to register
         self.canvas.setFocus()                            # sets focus without clicking on it
         self.cids.append(self.canvas.mpl_connect('pick_event', self._on_pick))
         self.cids.append(self.canvas.mpl_connect('draw_event', self._on_draw))
